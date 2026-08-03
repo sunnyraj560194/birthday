@@ -115,12 +115,12 @@ export default function Book() {
         ></Image>
 
         <Image
-          src="/ref/girl.jpg"
+          src="/pipis/pipi2.jpg"
           alt="Front Cover"
           fill
           priority
           draggable={false}
-          className="object-contain scale-33  rotate-10  translate-x-14 -translate-y-23 "
+          className="object-cover scale-33  rotate-10  translate-x-14 -translate-y-20 "
         ></Image>
 
         <Image
@@ -178,30 +178,30 @@ export default function Book() {
         ></Image>
 
         <Image
-          src="/ref/girl.jpg"
+          src="/pipis/pipi1.jpg"
           alt="Front Cover"
           fill
           priority
           draggable={false}
-          className="object-contain shadow-black rotate-20  translate-x-19 -translate-y-22  scale-22   "
+          className="object-cover shadow-black rotate-20  translate-x-19 -translate-y-22  scale-22   "
         ></Image>
 
         <Image
-          src="/ref/girl2.jpg"
+          src="/pipis/pipi3.jpg"
           alt="Front Cover"
           fill
           priority
           draggable={false}
-          className="object-contain shadow-black rotate-20  translate-x-26 -translate-y-43  scale-22   "
+          className="object-cover shadow-black rotate-20  translate-x-26 -translate-y-43  scale-19   "
         ></Image>
 
         <Image
-          src="/ref/girl3.jpg"
+          src="/pipis/pipi4.jpg"
           alt="Front Cover"
           fill
           priority
           draggable={false}
-          className="object-contain shadow-black rotate-20  translate-x-11 translate-y-1  scale-22   "
+          className="object-cover shadow-black rotate-20  translate-x-10 translate-y-3  scale-20   "
         ></Image>
 
         <Image
@@ -281,12 +281,12 @@ export default function Book() {
         />
 
         <Image
-          src="/ref/girl4.jpg"
+          src="/pipis/pipi6.jpg"
           alt="Frame"
           fill
           priority
           draggable={false}
-          className="object-contain scale-33 rotate-17 translate-x-13 -translate-y-21 z-30"
+          className="object-cover scale-33 rotate-17 translate-x-12 -translate-y-18 z-30"
         />
 
         {/* Photo Frame (Main Focus) */}
@@ -380,22 +380,22 @@ export default function Book() {
           className="object-contain scale-48  rotate-0 z-50 -translate-x-14 translate-y-28 "
         />
 
-        <Image
-          src="/ref/girl5.jpg"
+        {/* <Image
+          src="/pipis/pipi12.jpg"
           alt="Disk"
           fill
           priority
           draggable={false}
           className="object-contain scale-32  rotate-0 z-50 translate-x-19 -translate-y-32 "
-        />
+        /> */}
 
         <Image
-          src="/ref/girl1.jpg"
+          src="/pipis/pipi12.jpg"
           alt="Disk"
           fill
           priority
           draggable={false}
-          className="object-contain scale-68  rotate-0 z-50 translate-x-18 -translate-y-28 "
+          className="object-cover scale-30  rotate-0 z-50 translate-x-18 -translate-y-28 "
         />
 
         <Image
@@ -468,21 +468,21 @@ export default function Book() {
         />
 
         <Image
-          src="/ref/girl11.jpg"
+          src="/pipis/pipi9.jpg"
           alt="Disk"
           fill
           priority
           draggable={false}
-          className="object-contain scale-26  -rotate-11 z-50 translate-x-4 -translate-y-12 "
+          className="object-cover scale-23  -rotate-11 z-50 translate-x-4 -translate-y-10 "
         />
 
         <Image
-          src="/ref/girl10.jpg"
+          src="/pipis/pipi10.jpg"
           alt="Disk"
           fill
           priority
           draggable={false}
-          className="object-contain scale-26  rotate-11 z-50 translate-x-16 -translate-y-40 "
+          className="object-cover scale-23  rotate-11 z-50 translate-x-16 -translate-y-40 "
         />
 
         <Image
@@ -547,21 +547,21 @@ export default function Book() {
 
 
           <Image
-          src="/ref/girl9.jpg"
+          src="/pipis/pipi12.jpg"
           alt="Disk"
           fill
           priority
           draggable={false}
-          className="object-contain scale-28  -rotate-4 z-50 -translate-x-18 -translate-y-16 "
+          className="object-cover scale-28  -rotate-4 z-50 -translate-x-18 -translate-y-12 "
         />
         
           <Image
-          src="/ref/girl8.jpg"
+          src="/pipis/pipi13.jpg"
           alt="Disk"
           fill
           priority
           draggable={false}
-          className="object-contain scale-27  rotate-10 z-50 -translate-x-11 translate-y-13 "
+          className="object-cover scale-24  rotate-10 z-50 -translate-x-11 translate-y-14 "
         />
 
         <Image

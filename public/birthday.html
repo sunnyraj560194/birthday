@@ -19,6 +19,32 @@
     position:relative;
   }
 
+  /* ---------------- background reveal (behind everything) ---------------- */
+  .bg-reveal{
+    position:fixed;
+    inset:0;
+    z-index:0;
+    opacity:0;
+    pointer-events:none;
+  }
+  .bg-reveal img{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    opacity:0; /* animated in by GSAP, capped well below 100% so the number stays readable over it */
+    transform:scale(1.18);
+    filter:saturate(0.9) brightness(0.4) blur(18px);
+    will-change:transform, filter, opacity;
+  }
+  .bg-reveal::after{
+    content:'';
+    position:absolute;
+    inset:0;
+    background:radial-gradient(circle at 50% 50%, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.8) 78%);
+  }
+
   /* ---------------- intro counter ---------------- */
   .intro{
     position:fixed;
@@ -98,6 +124,11 @@
     display:block;
   }
   .watermark-btn:hover .watermark{opacity:0.075;}
+  .watermark.is-revealed,
+  .watermark-btn:hover .watermark.is-revealed{
+    opacity:1;
+    color:#fff;
+  }
 
   .press-prompt{
     position:absolute;
@@ -184,12 +215,164 @@
     z-index:3;
   }
 
+  /* ---------------- spotify-style mini player ---------------- */
+  .player{
+    position:fixed;
+    left:50%;
+    bottom:24px;
+    transform:translateX(-50%) translateY(120%);
+    z-index:25;
+    display:flex;
+    align-items:center;
+    gap:14px;
+    width:min(340px, calc(100vw - 32px));
+    padding:14px;
+    background:rgba(18,18,18,0.86);
+    backdrop-filter:blur(20px) saturate(160%);
+    -webkit-backdrop-filter:blur(20px) saturate(160%);
+    border:1px solid rgba(255,255,255,0.07);
+    border-radius:18px;
+    box-shadow:0 10px 32px rgba(0,0,0,0.5);
+    transition:transform 0.6s cubic-bezier(.16,1,.3,1), opacity 0.6s ease;
+    opacity:0;
+  }
+  .player.is-visible{
+    transform:translateX(-50%) translateY(0);
+    opacity:1;
+  }
+  .player-art{
+    position:relative;
+    flex-shrink:0;
+    width:52px;
+    height:52px;
+    border-radius:11px;
+    overflow:hidden;
+    background:#151515;
+  }
+  .player-art img{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    opacity:0;
+    transition:opacity 1s ease;
+  }
+  .player-art img.is-active{
+    opacity:1;
+  }
+  .player-info{
+    flex:1;
+    min-width:0;
+    display:flex;
+    flex-direction:column;
+    gap:5px;
+  }
+  .player-title{
+    font-size:13px;
+    font-weight:700;
+    color:#fff;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .player-artist{
+    font-size:10px;
+    color:#888;
+    letter-spacing:0.03em;
+    text-transform:uppercase;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .player-progress{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin-top:2px;
+  }
+  .player-time{
+    font-size:9px;
+    color:#6b6b6b;
+    font-variant-numeric:tabular-nums;
+    flex-shrink:0;
+    width:26px;
+  }
+  .player-time.dur{text-align:right;}
+  .player-seek{
+    flex:1;
+    appearance:none;
+    -webkit-appearance:none;
+    height:3px;
+    border-radius:2px;
+    background:linear-gradient(to right, #fff var(--progress, 0%), rgba(255,255,255,0.16) var(--progress, 0%));
+    outline:none;
+    cursor:pointer;
+  }
+  .player-seek::-webkit-slider-thumb{
+    -webkit-appearance:none;
+    appearance:none;
+    width:10px;
+    height:10px;
+    border-radius:50%;
+    background:#fff;
+    opacity:0;
+    transition:opacity 0.15s ease;
+  }
+  .player-seek:hover::-webkit-slider-thumb,
+  .player-seek:active::-webkit-slider-thumb{opacity:1;}
+  .player-seek::-moz-range-thumb{
+    width:10px;
+    height:10px;
+    border-radius:50%;
+    background:#fff;
+    border:none;
+    opacity:0;
+    transition:opacity 0.15s ease;
+  }
+  .player-seek:hover::-moz-range-thumb,
+  .player-seek:active::-moz-range-thumb{opacity:1;}
+  .player-btn{
+    flex-shrink:0;
+    width:36px;
+    height:36px;
+    border-radius:50%;
+    background:#fff;
+    border:none;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    -webkit-tap-highlight-color:transparent;
+    transition:transform 0.15s ease;
+  }
+  .player-btn:hover{transform:scale(1.06);}
+  .player-btn:active{transform:scale(0.94);}
+  .player-btn svg{width:15px; height:15px;}
+  .player-btn #pauseIcon{display:none;}
+  .player.is-playing .player-btn #playIcon{display:none;}
+  .player.is-playing .player-btn #pauseIcon{display:block;}
+
   @media (prefers-reduced-motion: reduce){
     *{animation-duration:0.01ms !important; transition-duration:0.01ms !important;}
   }
 </style>
 </head>
 <body>
+
+  <div class="bg-reveal" id="bgReveal">
+    <img id="bgRevealImg" src="" alt="">
+  </div>
+
+  <audio
+  id="bgMusic"
+  loop
+  playsinline
+  preload="auto"
+  volume="0.7"
+>
+  <source src="/sounds/pipi-song.mp3" type="audio/mpeg">
+</audio>
 
 <div class="intro" id="intro">
   <div class="intro-num" id="introNum">0</div>
@@ -212,25 +395,60 @@
 
 <div class="ember-layer" id="emberLayer"></div>
 
+<!-- ---------------- spotify-style mini player ---------------- -->
+<div class="player" id="musicPlayer">
+  <div class="player-art">
+    <img id="artA" class="is-active" src="/pipis/pipi1.jpg" alt="">
+    <img id="artB" src="/pipis/pipi2.jpg" alt="">
+  </div>
+  <div class="player-info">
+    <div class="player-title">Pipi's Song</div>
+    <div class="player-artist">Birthday Playlist</div>
+    <div class="player-progress">
+      <span class="player-time" id="curTime">0:00</span>
+      <input type="range" id="seek" class="player-seek" min="0" max="100" value="0" step="0.1" aria-label="Seek">
+      <span class="player-time dur" id="durTime">0:00</span>
+    </div>
+  </div>
+  <button class="player-btn" id="playPauseBtn" aria-label="Play or pause song">
+    <svg id="playIcon" viewBox="0 0 24 24" fill="#000"><path d="M8 5v14l11-7z"/></svg>
+    <svg id="pauseIcon" viewBox="0 0 24 24" fill="#000"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>
+  </button>
+</div>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script type="module">
   import { balloons, textBalloons } from "https://cdn.jsdelivr.net/npm/balloons-js/+esm";
   window.__balloonsJS = { balloons, textBalloons };
 </script>
 <script>
-  // ---- EDIT THIS: real birth date/time ----
-  const BIRTH_DATE = new Date(2001, 7, 2, 14, 30, 0);
+  // ---- EDIT THIS: real birth date/time, given in IST (India Standard Time) ----
+  // 14:30 IST on Aug 2, 2003 == 09:00 UTC on Aug 2, 2003  (birth year set so the reveal lands on 23)
+  const IST_OFFSET_MS = (5 * 60 + 30) * 60000;
+  // const BIRTH_UTC_MS = Date.UTC(2003, 7, 2, 9, 0, 0);
+  const BIRTH_UTC_MS = Date.UTC(2003, 7, 4, 18, 30, 0);
+  const shiftedBirth = new Date(BIRTH_UTC_MS + IST_OFFSET_MS); // read with getUTC* for IST wall-clock parts
 
   function computeParts(){
-    const now = new Date();
-    let years = now.getFullYear() - BIRTH_DATE.getFullYear();
-    const anniversary = new Date(BIRTH_DATE);
-    anniversary.setFullYear(now.getFullYear());
-    if(now < anniversary){
+    // shift "now" into the same IST-wall-clock domain so getUTC* reads IST time
+    // regardless of the viewer's own device timezone
+    const shiftedNow = new Date(Date.now() + IST_OFFSET_MS);
+
+    const by = shiftedBirth.getUTCFullYear();
+    const bmo = shiftedBirth.getUTCMonth();
+    const bda = shiftedBirth.getUTCDate();
+    const bhh = shiftedBirth.getUTCHours();
+    const bmi = shiftedBirth.getUTCMinutes();
+    const bse = shiftedBirth.getUTCSeconds();
+
+    let years = shiftedNow.getUTCFullYear() - by;
+    let annivMs = Date.UTC(shiftedNow.getUTCFullYear(), bmo, bda, bhh, bmi, bse);
+    if(shiftedNow.getTime() < annivMs){
       years--;
-      anniversary.setFullYear(now.getFullYear() - 1);
+      annivMs = Date.UTC(shiftedNow.getUTCFullYear() - 1, bmo, bda, bhh, bmi, bse);
     }
-    const sinceAnniv = now - anniversary;
+
+    const sinceAnniv = shiftedNow.getTime() - annivMs;
     const totalSec = Math.floor(sinceAnniv / 1000);
     return {
       years,
@@ -266,6 +484,8 @@
   const emberLayer = document.getElementById('emberLayer');
   const pressPrompt = document.getElementById('pressPrompt');
   const revealFlash = document.getElementById('revealFlash');
+  const bgReveal = document.getElementById('bgReveal');
+  const bgRevealImg = document.getElementById('bgRevealImg');
   let burning = false;
   let balloonsJSFired = false;
 
@@ -280,6 +500,38 @@
         { text: "🎉🎂🎈", fontSize: 120, color: "#ffffff" },
       ]);
     }
+  }
+
+  // brings a background photo in behind the burned number once it's revealed -
+  // eases in from a soft, zoomed, blurred state into a settled frame, capped
+  // well under full opacity so the number and the photo both stay legible
+  // together instead of one washing out the other
+  const BG_REVEAL_SRC = '/bg-img.jpeg';
+  const BG_MAX_OPACITY = 0.55;
+  function revealBackground(){
+    bgRevealImg.src = BG_REVEAL_SRC;
+    gsap.killTweensOf([bgReveal, bgRevealImg]);
+    gsap.set(bgReveal, {opacity:1});
+    gsap.fromTo(bgRevealImg,
+      { opacity:0, scale:1.18, filter:'saturate(0.9) brightness(0.4) blur(18px)' },
+      {
+        opacity:BG_MAX_OPACITY,
+        scale:1,
+        filter:'saturate(0.9) brightness(0.55) blur(0px)',
+        duration:2.6,
+        ease:'power3.out',
+        onComplete: () => {
+          // slow ambient drift once it's settled in, like a living photo
+          gsap.to(bgRevealImg, {
+            scale:1.08,
+            duration:22,
+            ease:'sine.inOut',
+            yoyo:true,
+            repeat:-1
+          });
+        }
+      }
+    );
   }
 
   function spawnEmber(x, y, intensity){
@@ -560,18 +812,38 @@
       revealed = true;
       canvas.style.transform = 'translate(0,0)';
       watermarkEl.textContent = String(AGE).padStart(2,'0');
+      watermarkEl.classList.add('is-revealed');
       fireBalloonsJS();
+      revealBackground();
       gsap.to(pressPrompt, {opacity:0, duration:0.5, ease:'power2.out'});
       gsap.fromTo(revealFlash,
         {scale:0.2, opacity:0.95},
-        {scale:6.5, opacity:0, duration:1.05, ease:'power2.out'}
+        {scale:7.5, opacity:0, duration:1.3, ease:'power2.out'}
       );
-    })
-    .set(watermarkEl, {color:'#fff', textShadow:'none', scale:1, filter:'blur(0px)', opacity:0.09})
+
+      // the number itself blooms in solid white - starts soft/blurred/zoomed
+      // out of the ember afterglow, then settles sharp with a brief warm glow
+      gsap.fromTo(watermarkEl,
+        { opacity:0, scale:0.8, filter:'blur(22px)', color:'#fff' },
+        { opacity:1, scale:1, filter:'blur(0px)', duration:1.4, ease:'expo.out' }
+      );
+      gsap.fromTo(watermarkEl,
+        { textShadow:'0 0 0px rgba(255,200,140,0)' },
+        {
+          textShadow:'0 0 70px rgba(255,255,255,0.45)',
+          duration:0.75,
+          ease:'sine.out',
+          yoyo:true,
+          repeat:1,
+          delay:0.15,
+          onComplete: () => { watermarkEl.style.textShadow = 'none'; }
+        }
+      );
+    }, null, '+=0')
     .call(() => {
       triggerBtn.style.pointerEvents = 'none';
       triggerBtn.setAttribute('aria-disabled', 'true');
-    });
+    }, null, '+=1.4');
   }
 
   triggerBtn.addEventListener('click', burnAndRelease);
@@ -639,14 +911,96 @@
     .set('#intro', {display: 'none'})
     .fromTo('.corner', {opacity:0, y:6}, {opacity:1, y:0, duration:0.6, stagger:0.1})
     .to('#pressPrompt', {opacity:1, duration:0.7, ease:'power2.out'}, '<0.2')
-    .set('#pressPrompt', {pointerEvents:'auto'});
+    .set('#pressPrompt', {pointerEvents:'auto'})
+    .call(() => {
+      // reveal the mini player once the intro sequence has resolved
+      document.getElementById('musicPlayer').classList.add('is-visible');
+    }, null, '<');
 
   // ---------------- live readout tick ----------------
   setInterval(() => {
     const p = computeParts();
     document.getElementById('liveReadout').textContent = readout(p);
   }, 1000);
+
+  // ---------------- spotify-style mini player controls ----------------
+  const bgMusic = document.getElementById('bgMusic');
+  const musicPlayer = document.getElementById('musicPlayer');
+  const playPauseBtn = document.getElementById('playPauseBtn');
+  const seek = document.getElementById('seek');
+  const curTimeEl = document.getElementById('curTime');
+  const durTimeEl = document.getElementById('durTime');
+
+  function formatTime(sec){
+    if(!isFinite(sec) || isNaN(sec)) return '0:00';
+    const m = Math.floor(sec / 60);
+    const s = Math.floor(sec % 60);
+    return `${m}:${String(s).padStart(2,'0')}`;
+  }
+
+  let seeking = false;
+
+  playPauseBtn.addEventListener('click', () => {
+    if(bgMusic.paused){
+      bgMusic.play().catch(() => {});
+    } else {
+      bgMusic.pause();
+    }
+  });
+
+  bgMusic.addEventListener('play', () => musicPlayer.classList.add('is-playing'));
+  bgMusic.addEventListener('pause', () => musicPlayer.classList.remove('is-playing'));
+
+  bgMusic.addEventListener('loadedmetadata', () => {
+    durTimeEl.textContent = formatTime(bgMusic.duration);
+  });
+
+  bgMusic.addEventListener('timeupdate', () => {
+    if(seeking) return;
+    curTimeEl.textContent = formatTime(bgMusic.currentTime);
+    const pct = bgMusic.duration ? (bgMusic.currentTime / bgMusic.duration) * 100 : 0;
+    seek.value = pct;
+    seek.style.setProperty('--progress', pct + '%');
+  });
+
+  seek.addEventListener('input', () => {
+    seeking = true;
+    seek.style.setProperty('--progress', seek.value + '%');
+    curTimeEl.textContent = formatTime((seek.value / 100) * (bgMusic.duration || 0));
+  });
+
+  seek.addEventListener('change', () => {
+    if(bgMusic.duration){
+      bgMusic.currentTime = (seek.value / 100) * bgMusic.duration;
+    }
+    seeking = false;
+  });
+
+  // browsers block un-prompted audio autoplay - attempt it, and otherwise
+  // let the mini player's play button be the first user gesture that starts it
+  bgMusic.play().catch(() => {});
+
+  // ---------------- player art: crossfade through pipis/pipi1.jpg..pipi13.jpg ----------------
+  const PIPI_COUNT = 13;
+  const pipiSrc = (n) => `/pipis/pipi${n}.jpg`;
+  const artA = document.getElementById('artA');
+  const artB = document.getElementById('artB');
+  let pipiIndex = 1; // artA currently shows pipi1
+  let showingA = true;
+
+  setInterval(() => {
+    pipiIndex = (pipiIndex % PIPI_COUNT) + 1;
+    const nextSrc = pipiSrc(pipiIndex);
+    const incoming = showingA ? artB : artA;
+    const outgoing = showingA ? artA : artB;
+    incoming.src = nextSrc;
+    incoming.classList.add('is-active');
+    outgoing.classList.remove('is-active');
+    showingA = !showingA;
+  }, 3200);
 </script>
+
+
 
 </body>
 </html>

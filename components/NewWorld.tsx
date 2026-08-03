@@ -78,20 +78,40 @@ function useCard() {
 function CardProvider({ children }: { children: React.ReactNode }) {
   const [selectedCard, setSelectedCard] = useState<Card | null>(null)
 
+  // const cards: Card[] = [
+  //   // { id: "1", imageUrl: "/ref/💜.jpg", alt: "Cutie", title: "Cutie" },
+  //   { id: "2", imageUrl: "/ref/girl.jpg", alt: "Baddie", title: "Baddie" },
+  //   { id: "3", imageUrl: "/ref/girl2.jpg", alt: "Angel", title: "Angel" },
+  //   { id: "4", imageUrl: "/ref/girl3.jpg", alt: "Dreamgirl", title: "Dreamgirl" },
+  //   { id: "5", imageUrl: "/ref/girl4.jpg", alt: "Sweetheart", title: "Sweetheart" },
+  //   { id: "6", imageUrl: "/ref/girl5.jpg", alt: "Icon", title: "Icon" },
+  //   { id: "7", imageUrl: "/ref/girl6.jpg", alt: "Stunner", title: "Stunner" },
+  //   { id: "8", imageUrl: "/ref/girl7.jpg", alt: "Babe", title: "Babe" },
+  //   { id: "9", imageUrl: "/ref/girl8.jpg", alt: "Darling", title: "Darling" },
+  //   { id: "10", imageUrl: "/ref/girl9.jpg", alt: "Sunshine", title: "Sunshine" },
+  //   { id: "11", imageUrl: "/ref/girl10.jpg", alt: "Queen", title: "Queen" },
+  //   { id: "12", imageUrl: "/ref/girl11.jpg", alt: "Heartbreaker", title: "Heartbreaker" },
+  // ]
+
   const cards: Card[] = [
-    // { id: "1", imageUrl: "/ref/💜.jpg", alt: "Cutie", title: "Cutie" },
-    { id: "2", imageUrl: "/ref/girl.jpg", alt: "Baddie", title: "Baddie" },
-    { id: "3", imageUrl: "/ref/girl2.jpg", alt: "Angel", title: "Angel" },
-    { id: "4", imageUrl: "/ref/girl3.jpg", alt: "Dreamgirl", title: "Dreamgirl" },
-    { id: "5", imageUrl: "/ref/girl4.jpg", alt: "Sweetheart", title: "Sweetheart" },
-    { id: "6", imageUrl: "/ref/girl5.jpg", alt: "Icon", title: "Icon" },
-    { id: "7", imageUrl: "/ref/girl6.jpg", alt: "Stunner", title: "Stunner" },
-    { id: "8", imageUrl: "/ref/girl7.jpg", alt: "Babe", title: "Babe" },
-    { id: "9", imageUrl: "/ref/girl8.jpg", alt: "Darling", title: "Darling" },
-    { id: "10", imageUrl: "/ref/girl9.jpg", alt: "Sunshine", title: "Sunshine" },
-    { id: "11", imageUrl: "/ref/girl10.jpg", alt: "Queen", title: "Queen" },
-    { id: "12", imageUrl: "/ref/girl11.jpg", alt: "Heartbreaker", title: "Heartbreaker" },
-  ]
+  { id: "1", imageUrl: "/pipis/pipi1.jpg", alt: "Cutie", title: "Cutie" },
+
+  { id: "2", imageUrl: "/pipis/pipi2.jpg", alt: "Baddie", title: "Baddie" },
+  { id: "3", imageUrl: "/pipis/pipi3.jpg", alt: "Angel", title: "Angel" },
+  { id: "4", imageUrl: "/pipis/pipi4.jpg", alt: "Dreamgirl", title: "Dreamgirl" },
+  { id: "5", imageUrl: "/pipis/pipi5.jpg", alt: "Sweetheart", title: "Sweetheart" },
+  { id: "6", imageUrl: "/pipis/pipi6.jpg", alt: "Icon", title: "Icon" },
+  { id: "7", imageUrl: "/pipis/pipi7.jpg", alt: "Stunner", title: "Stunner" },
+  { id: "8", imageUrl: "/pipis/pipi8.jpg", alt: "Babe", title: "Babe" },
+  { id: "9", imageUrl: "/pipis/pipi9.jpg", alt: "Darling", title: "Darling" },
+  { id: "10", imageUrl: "/pipis/pipi10.jpg", alt: "Sunshine", title: "Sunshine" },
+  { id: "11", imageUrl: "/pipis/pipi11.jpg", alt: "Queen", title: "Queen" },
+  { id: "12", imageUrl: "/pipis/pipi12.jpg", alt: "Heartbreaker", title: "Heartbreaker" },
+
+  // optional extra images
+  // { id: "13", imageUrl: "/pipis/pipi13.jpg", alt: "Extra 1", title: "Extra 1" },
+  // { id: "14", imageUrl: "/pipis/pipi14.jpg", alt: "Extra 2", title: "Extra 2" },
+];
 
   return (
     <CardContext.Provider value={{ selectedCard, setSelectedCard, cards }}>
