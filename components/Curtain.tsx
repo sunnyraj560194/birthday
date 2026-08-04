@@ -98,10 +98,33 @@ interface Remaining {
   seconds: number;
 }
 
-function getRemaining(target: Date): Remaining {
-  const diff = target.getTime() - Date.now();
-  if (diff <= 0) return { total: 0, days: 0, hours: 0, minutes: 0, seconds: 0 };
+// function getRemaining(target: Date): Remaining {
+//   const diff = target.getTime() - Date.now();
+//   if (diff <= 0) return { total: 0, days: 0, hours: 0, minutes: 0, seconds: 0 };
+//   const total = Math.floor(diff / 1000);
+//   return {
+//     total,
+//     days: Math.floor(total / 86400),
+//     hours: Math.floor((total % 86400) / 3600),
+//     minutes: Math.floor((total % 3600) / 60),
+//     seconds: total % 60,
+//   };
+// }
+
+const TARGET = new Date('2026-08-05T00:00:00+05:30').getTime();
+
+async function getRemaining() {
+  const res = await fetch('/api/time', { cache: 'no-store' });
+  const { now } = await res.json();
+
+  const diff = TARGET - now;
+
+  if (diff <= 0) {
+    return { days: 0, hours: 0, minutes: 0, seconds: 0, total: 0 };
+  }
+
   const total = Math.floor(diff / 1000);
+
   return {
     total,
     days: Math.floor(total / 86400),
@@ -117,7 +140,6 @@ const DEFAULT_TARGET = new Date(Date.UTC(2026, 7, 5, 0, 0, 0) - (5 * 60 + 30) * 
 type UnitKey = 'days' | 'hours' | 'minutes' | 'seconds';
 
 export default function ShowtimeCountdown({
-  targetDate = DEFAULT_TARGET,
   tickerText = 'SAVE THE DATE · AUGUST 05 ·',
   marqueeTitle = 'NOW SHOWING',
   marqueeSub = "a Pipi production, live August 5th",
@@ -358,8 +380,8 @@ export default function ShowtimeCountdown({
   /* ---------- countdown tick (stops entirely the moment unlock triggers) ---------- */
   useEffect(() => {
     if (revealed) return;
-    function paint() {
-      const r = getRemaining(targetDate);
+    async function paint() {
+      const r =  await getRemaining();
       paintUnit(daysRef.current, 'days', String(Math.min(r.days, 99)).padStart(2, '0'));
       paintUnit(hoursRef.current, 'hours', String(r.hours).padStart(2, '0'));
       paintUnit(minutesRef.current, 'minutes', String(r.minutes).padStart(2, '0'));
@@ -374,7 +396,7 @@ export default function ShowtimeCountdown({
         intervalRef.current = null;
       }
     };
-  }, [targetDate, revealed, paintUnit, triggerUnlock]);
+  }, [revealed, paintUnit, triggerUnlock]);
 
   const overlay = (
     <div className="showtime-root " ref={rootRef}>
