@@ -16,7 +16,7 @@ export default function Home() {
        <ShowtimeCountdown
       targetDate={new Date('2026-08-05T00:00:00+05:30')}
       songSrc="/sounds/pipi-song.mp3"
-      songLabel="Main Theme"
+     
     >
 <div className=" h-full w-full overflow-x-hidden overflow-y-scroll snap-y snap-mandatory bg-zinc-50 dark:bg-black select-none scroll-smooth">
       {/* <section className="h-screen w-full snap-start snap-always shrink-0">
