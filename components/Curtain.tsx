@@ -432,9 +432,9 @@ export default function ShowtimeCountdown({
             </div>
 
             <p className="lock-foot">{doorsText}</p>
-            <button className="peek" onClick={triggerUnlock}>
+            {/* <button className="peek" onClick={triggerUnlock}>
               preview the show →
-            </button>
+            </button> */}
           </div>
         </div>
       </div>
