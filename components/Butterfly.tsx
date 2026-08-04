@@ -45,31 +45,31 @@ const DEFAULT_NOTES: NoteData[] = [
   {
     id: "n1",
     title: "01",
-    text: "The first time I saw this, I knew it deserved its own little corner of the internet.",
+    text: "Every butterfly escapes... except me. I've been happily stuck with you since day one. 🤍",
     accent: "#D98E7E",
   },
   {
     id: "n2",
     title: "02",
-    text: "Some things are worth keeping folded up until you're ready to open them.",
+    text: "Is butterfly ki tarah meri har khushi ka raasta bhi aakhir tum tak hi aakar rukta hai. 🫶",
     accent: "#C9A15E",
   },
   {
     id: "n3",
     title: "03",
-    text: "Every note here is a small moment. Catch one to read it.",
+    text: "Tumne butterfly ko touch kiya... aur meri heartbeat phir se skip kar gayi. 😭❤️",
     accent: "#7E9C68",
   },
   {
     id: "n4",
     title: "04",
-    text: "This page remembers softly — nothing loud, just little things that mattered.",
+    text: "Looks like you're really good at catching butterflies... no wonder you caught my heart so easily. ❤️",
     accent: "#B27A94",
   },
   {
     id: "n5",
     title: "05",
-    text: "Written for no one in particular, and for you in particular.",
+    text: "This butterfly landed in your hands for a moment... my heart chose to stay there forever. 🦋",
     accent: "#7C8FA6",
   },
 ];

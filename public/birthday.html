@@ -489,6 +489,8 @@
   let burning = false;
   let balloonsJSFired = false;
 
+ 
+
   function fireBalloonsJS(){
     if(balloonsJSFired) return;
     balloonsJSFired = true;
@@ -847,6 +849,16 @@
   }
 
   triggerBtn.addEventListener('click', burnAndRelease);
+
+
+
+  //play music on button click
+  triggerBtn.addEventListener('click', () => {
+  if (bgMusic.paused) {
+    bgMusic.play().catch(() => {}); // catch autoplay-policy rejection silently
+    musicPlayer.classList.add('is-visible', 'is-playing');
+  }
+}, { once: true }); // only trigger the first press/burn
 
   // ---------------- intro: odometer-style roll into the number, then zoom through ----------------
   const introNum = document.getElementById('introNum');

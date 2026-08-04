@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -228,6 +227,14 @@ body{
   color:#1b1208;
   font-weight:700;
   box-shadow:0 8px 24px rgba(255,184,105,.28);
+  overflow:hidden;
+}
+
+.avatar img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
 }
 
 .name{
@@ -451,7 +458,9 @@ body{
     </div>
 
     <div class="header" id="header">
-      <div class="avatar">P</div>
+      <div class="avatar">
+        <img src="/pipis/pipi5.jpg" alt="Pipi" />
+      </div>
       <div>
         <div class="name">sidd's pipi ♥️</div>
         <div class="sub">iMessage · online now</div>
@@ -656,4 +665,3 @@ observer.observe(document.querySelector('.screen'));
 
 </body>
 </html>
-

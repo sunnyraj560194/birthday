@@ -71,7 +71,7 @@ export const HeroSection = () => {
           <br />
           <span className="font-bold">Birthday</span>
           <br/>
-          <span className="font-bold text-amber-500">pipi</span>
+          <span className="font-bold mt-1 text-amber-500">sidd's pipi</span>
         </h1>
         <div className="mt-6 h-px w-16 bg-[#9C7A3F]" />
         <p className="hero-body mt-6 max-w-sm text-base leading-relaxed text-[#4A4A42]">
