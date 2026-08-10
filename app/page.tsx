@@ -14,8 +14,12 @@ export default function Home() {
   return (
 
        <ShowtimeCountdown
-      targetDate={new Date('2026-08-05T00:00:00+05:30')}
-      songSrc="/sounds/pipi-song.mp3"
+      
+      // change this date to the desired countdown target date
+      showPreviewButton={true}
+      
+      targetDate={new Date('2026-08-11T00:00:00+05:30')}
+     
      
     >
 <div className=" h-full w-full overflow-x-hidden overflow-y-scroll snap-y snap-mandatory bg-zinc-50 dark:bg-black select-none scroll-smooth">

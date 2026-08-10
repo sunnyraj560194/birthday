@@ -398,11 +398,11 @@
 <!-- ---------------- spotify-style mini player ---------------- -->
 <div class="player" id="musicPlayer">
   <div class="player-art">
-    <img id="artA" class="is-active" src="/pipis/pipi1.jpg" alt="">
-    <img id="artB" src="/pipis/pipi2.jpg" alt="">
+    <img id="artA" class="is-active" src="/ref/girl1.jpg" alt="">
+    <img id="artB" src="/ref/girl2.jpg" alt="">
   </div>
   <div class="player-info">
-    <div class="player-title">Pipi's Song</div>
+    <div class="player-title">Sweety Song</div>
     <div class="player-artist">Birthday Playlist</div>
     <div class="player-progress">
       <span class="player-time" id="curTime">0:00</span>
@@ -508,8 +508,8 @@
   // eases in from a soft, zoomed, blurred state into a settled frame, capped
   // well under full opacity so the number and the photo both stay legible
   // together instead of one washing out the other
-  const BG_REVEAL_SRC = '/bg-img.jpeg';
-  const BG_MAX_OPACITY = 0.55;
+  const BG_REVEAL_SRC = '/bg2.jpg';
+  const BG_MAX_OPACITY = 0.85;
   function revealBackground(){
     bgRevealImg.src = BG_REVEAL_SRC;
     gsap.killTweensOf([bgReveal, bgRevealImg]);
@@ -993,8 +993,8 @@
   bgMusic.play().catch(() => {});
 
   // ---------------- player art: crossfade through pipis/pipi1.jpg..pipi13.jpg ----------------
-  const PIPI_COUNT = 13;
-  const pipiSrc = (n) => `/pipis/pipi${n}.jpg`;
+  const PIPI_COUNT = 10;
+  const pipiSrc = (n) => `/ref/girl${n}.jpg`;
   const artA = document.getElementById('artA');
   const artB = document.getElementById('artB');
   let pipiIndex = 1; // artA currently shows pipi1

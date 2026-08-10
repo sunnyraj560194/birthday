@@ -7,37 +7,37 @@ const path =
   "M1 209.434C58.5872 255.935 387.926 325.938 482.583 209.434C600.905 63.8051 525.516 -43.2211 427.332 19.9613C329.149 83.1436 352.902 242.723 515.041 267.302C644.752 286.966 943.56 181.94 995 156.5";
 
 // Local photos from /public/ref — resolve to /ref/*.jpg at runtime.
-// const imgs = [
-//   { src: "/ref/heart.jpg" },
-//   { src: "/ref/girl.jpg" },
-//   { src: "/ref/girl2.jpg" },
-//   { src: "/ref/girl3.jpg" },
-//   { src: "/ref/girl4.jpg" },
-//   { src: "/ref/girl5.jpg" },
-//   { src: "/ref/girl6.jpg" },
-//   { src: "/ref/girl7.jpg" },
-//   { src: "/ref/girl8.jpg" },
-//   { src: "/ref/girl9.jpg" },
-//   { src: "/ref/girl10.jpg" },
-//   { src: "/ref/girl11.jpg" },
-// ];
-
 const imgs = [
-  { src: "/pipis/pipi1.jpg" },
-  { src: "/pipis/pipi2.jpg" },
-  { src: "/pipis/pipi3.jpg" },
-  { src: "/pipis/pipi4.jpg" },
-  { src: "/pipis/pipi5.jpg" },
-  { src: "/pipis/pipi6.jpg" },
-  { src: "/pipis/pipi7.jpg" },
-  { src: "/pipis/pipi8.jpg" },
-  { src: "/pipis/pipi9.jpg" },
-  { src: "/pipis/pipi10.jpg" },
-  { src: "/pipis/pipi11.jpg" },
-  { src: "/pipis/pipi12.jpg" },
-  { src: "/pipis/pipi13.jpg" },
-  { src: "/pipis/pipi14.jpg" },
+  { src: "/ref/heart.jpg" },
+  { src: "/ref/girl.jpg" },
+  { src: "/ref/girl2.jpg" },
+  { src: "/ref/girl3.jpg" },
+  { src: "/ref/girl4.jpg" },
+  { src: "/ref/girl5.jpg" },
+  { src: "/ref/girl6.jpg" },
+  { src: "/ref/girl7.jpg" },
+  { src: "/ref/girl8.jpg" },
+  { src: "/ref/girl9.jpg" },
+  { src: "/ref/girl10.jpg" },
+  { src: "/ref/girl11.jpg" },
 ];
+
+// const imgs = [
+//   { src: "/pipis/pipi1.jpg" },
+//   { src: "/pipis/pipi2.jpg" },
+//   { src: "/pipis/pipi3.jpg" },
+//   { src: "/pipis/pipi4.jpg" },
+//   { src: "/pipis/pipi5.jpg" },
+//   { src: "/pipis/pipi6.jpg" },
+//   { src: "/pipis/pipi7.jpg" },
+//   { src: "/pipis/pipi8.jpg" },
+//   { src: "/pipis/pipi9.jpg" },
+//   { src: "/pipis/pipi10.jpg" },
+//   { src: "/pipis/pipi11.jpg" },
+//   { src: "/pipis/pipi12.jpg" },
+//   { src: "/pipis/pipi13.jpg" },
+//   { src: "/pipis/pipi14.jpg" },
+// ];
 
 
 
@@ -71,11 +71,11 @@ export const HeroSection = () => {
           <br />
           <span className="font-bold">Birthday</span>
           <br/>
-          <span className="font-bold mt-1 text-amber-500">sidd's pipi</span>
+          <span className="font-bold mt-1 text-amber-500">Sweety</span>
         </h1>
         <div className="mt-6 h-px w-16 bg-[#9C7A3F]" />
         <p className="hero-body mt-6 max-w-sm text-base leading-relaxed text-[#4A4A42]">
-        pipi's tasveere? ❌   source of sidd's happiness ✅
+       wishing you a day filled with love, laughter, and all the happiness your heart can hold. May this year bring you endless joy and unforgettable memories. Happy Birthday!
         </p>
       </div>
 

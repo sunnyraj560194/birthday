@@ -3,55 +3,41 @@
 /**
  * ShowtimeCountdown
  * -------------------------------------------------------------------------
- * A cinema-marquee countdown. At zero, the curtain opens once and the lock
- * screen fully unmounts.
+ * A cinema-marquee countdown. At zero, the curtain opens, and once it has
+ * fully finished opening the whole lock screen fades out to reveal your
+ * content.
  *
- * Fixes in this version:
- *  1. `children` are NOT mounted — at all, not even hidden behind the
- *     curtain — until the curtain has FULLY finished opening. That's the
- *     only way to guarantee anything your homepage autoplays (audio, video)
- *     can never start early or overlap the lock-screen song. There's a
- *     brief moment where the curtain is open and your content is still
- *     painting in; that's the trade-off for zero audio overlap.
- *  2. The lock screen has its own small "now playing" indicator + mute
- *     toggle for `songSrc`. That song fades to silence as the curtain opens
- *     and is fully paused before your content ever mounts — it can never
- *     overlap with audio/video in your own page.
- *  3. The overlay is rendered through a React portal into `document.body`
- *     and body scroll is locked while it's up. This fixes the "not actually
- *     full screen on laptop" bug, which happens when `position: fixed`
- *     picks up a transformed/animated ancestor (very common with Next.js
- *     page-transition wrappers) as its containing block instead of the
- *     viewport.
- *  4. The countdown interval and all ambient GSAP tweens (bulb pulse,
- *     projector flicker) are killed the instant zero is hit, before the
- *     curtain timeline even starts, so nothing is competing with it for
- *     frames.
- *  5. The curtain timeline is now fully sequential (no negative/overlapping
- *     offsets), the stripe pattern uses a wider, soft-edged repeat instead
- *     of a tight hard-edged one (tight repeating gradients shimmer/moiré
- *     under transform on most displays — that was the main source of the
- *     "glitchy" look), and there's no scrollbar that can pop in/out mid
- *     animation and shift the layout.
- *  6. Optional `redirectTo`: instead of opening the curtain in place, do a
- *     quick fade and navigate to a real route (`router.push`). This is the
- *     smoothest option if "the show" actually lives on its own page — no
- *     mount timing to think about at all, Next.js just serves the page.
+ * Reveal sequence:
+ *  1. Lock content fades out.
+ *  2. Curtain parts + chrome fades (existing GSAP timeline, unchanged).
+ *  3. The moment the curtain finishes opening, your real content mounts
+ *     underneath the lock screen while it's still fully opaque, so there
+ *     is never a visible flash of unpainted content.
+ *  4. Once content has had a paint frame, the whole lock-screen overlay
+ *     fades to transparent and unmounts, revealing your page already
+ *     fully painted.
+ *
+ *  All the original fixes (children not mounted until safe, own audio that
+ *  never overlaps yours, portal + scroll lock, killing ambient tweens
+ *  before the reveal timeline starts, sequential/non-overlapping curtain
+ *  timeline) are unchanged.
  *
  * Install once:
  *   npm install gsap
  *
  * Usage A — reveal in place:
- *   <ShowtimeCountdown targetDate={new Date('2026-08-05T00:00:00+05:30')} songSrc="/song.mp3">
+ *   <ShowtimeCountdown targetDate={new Date('2026-08-11T00:00:00+05:30')} songSrc="/song.mp3">
  *     <YourHomepage />
  *   </ShowtimeCountdown>
  *
  * Usage B — redirect on completion (recommended if smoothness matters most):
  *   <ShowtimeCountdown
- *     targetDate={new Date('2026-08-05T00:00:00+05:30')}
+ *     targetDate={new Date('2026-08-11T00:00:00+05:30')}
  *     songSrc="/song.mp3"
  *     redirectTo="/live"
  *   />
+ *   (redirectTo skips the fade entirely — there's no local content to mask
+ *   a paint-in gap for, Next.js just serves the destination page.)
  *
  * Perf note: import this with
  *   next/dynamic(() => import('./ShowtimeCountdown'), { ssr: false })
@@ -88,6 +74,12 @@ export interface ShowtimeCountdownProps {
   redirectTo?: string;
   /** Your actual page content. Not mounted until the countdown hits zero. Ignored when `redirectTo` is set. */
   children?: ReactNode;
+  /**
+   * Shows a small "Preview" button on the lock screen that triggers the
+   * curtain-open early, so you can check the reveal without waiting for
+   * the real countdown. Defaults to true — set to false for production.
+   */
+  showPreviewButton?: boolean;
 }
 
 interface Remaining {
@@ -98,20 +90,7 @@ interface Remaining {
   seconds: number;
 }
 
-// function getRemaining(target: Date): Remaining {
-//   const diff = target.getTime() - Date.now();
-//   if (diff <= 0) return { total: 0, days: 0, hours: 0, minutes: 0, seconds: 0 };
-//   const total = Math.floor(diff / 1000);
-//   return {
-//     total,
-//     days: Math.floor(total / 86400),
-//     hours: Math.floor((total % 86400) / 3600),
-//     minutes: Math.floor((total % 3600) / 60),
-//     seconds: total % 60,
-//   };
-// }
-
-const TARGET = new Date('2026-08-05T00:00:00+05:30').getTime();
+const TARGET = new Date('2026-08-11T00:00:00+05:30').getTime();
 
 async function getRemaining() {
   const res = await fetch('/api/time', { cache: 'no-store' });
@@ -134,24 +113,25 @@ async function getRemaining() {
   };
 }
 
-/** Default target: Aug 5 2026, 00:00 IST */
-const DEFAULT_TARGET = new Date(Date.UTC(2026, 7, 5, 0, 0, 0) - (5 * 60 + 30) * 60 * 1000);
+/** Default target: Aug 11 2026, 00:00 IST */
+const DEFAULT_TARGET = new Date(Date.UTC(2026, 7, 11, 0, 0, 0) - (5 * 60 + 30) * 60 * 1000);
 
 type UnitKey = 'days' | 'hours' | 'minutes' | 'seconds';
 
 export default function ShowtimeCountdown({
-  tickerText = 'SAVE THE DATE · AUGUST 05 ·',
+  tickerText = 'SAVE THE DATE · AUGUST 11 ·',
   marqueeTitle = 'NOW SHOWING',
-  marqueeSub = "a Pipi production, live August 5th",
+  marqueeSub = "a Pipi production, live August 11th",
   doorsText = 'doors open at midnight, IST',
   songSrc,
   songVolume = 0.6,
   redirectTo,
   children,
+  showPreviewButton = true,
 }: ShowtimeCountdownProps) {
   const router = useRouter();
 
-  // Both flip together, only once the curtain has fully finished opening.
+  // Both flip together, only once the lock screen has fully faded out.
   // `mounted` gates your children, `revealed` unmounts the overlay itself.
   const [mounted, setMounted] = useState(false);
   const [revealed, setRevealed] = useState(false);
@@ -324,7 +304,7 @@ export default function ShowtimeCountdown({
     [buildColumns, setDigits]
   );
 
-  /* ---------- the one and only animation: curtain opens (or fade + redirect), then cleanup ---------- */
+  /* ---------- the reveal: curtain opens, then the whole lock screen fades out ---------- */
   const triggerUnlock = useCallback(() => {
     if (unlockedRef.current) return;
     unlockedRef.current = true;
@@ -342,13 +322,24 @@ export default function ShowtimeCountdown({
     const finish = () => {
       if (redirectTo) {
         router.push(redirectTo);
-      } else {
-        // Only mount your content once the curtain has fully finished
-        // opening. Nothing of yours — including any autoplaying song or
-        // video — starts a single frame earlier than this.
-        setMounted(true);
-        setRevealed(true);
+        return;
       }
+      // Mount real content now — it paints hidden behind the still-opaque
+      // lock screen, so there's no visible flash of unpainted content.
+      setMounted(true);
+      requestAnimationFrame(() => {
+        if (reduceMotionRef.current) {
+          setRevealed(true);
+          return;
+        }
+        gsap.to(rootRef.current, {
+          opacity: 0,
+          duration: 0.6,
+          delay: 0.15,
+          ease: 'power2.out',
+          onComplete: () => setRevealed(true),
+        });
+      });
     };
 
     const curtainL = curtainLRef.current;
@@ -369,6 +360,7 @@ export default function ShowtimeCountdown({
     // was causing multiple tweens to compete for frames at once. The two
     // curtain halves and the chrome fade all start together at the "open"
     // label so the parting reads as one clean motion, not layered stutters.
+    // Once the curtain has fully finished opening, the whole screen fades.
     const tl = gsap.timeline({ onComplete: finish });
     tl.to(lockContentRef.current, { opacity: 0, y: -10, duration: 0.35, ease: 'power2.inOut' })
       .addLabel('open', '+=0.05')
@@ -381,7 +373,7 @@ export default function ShowtimeCountdown({
   useEffect(() => {
     if (revealed) return;
     async function paint() {
-      const r =  await getRemaining();
+      const r = await getRemaining();
       paintUnit(daysRef.current, 'days', String(Math.min(r.days, 99)).padStart(2, '0'));
       paintUnit(hoursRef.current, 'hours', String(r.hours).padStart(2, '0'));
       paintUnit(minutesRef.current, 'minutes', String(r.minutes).padStart(2, '0'));
@@ -402,7 +394,7 @@ export default function ShowtimeCountdown({
     <div className="showtime-root " ref={rootRef}>
       <link
         rel="stylesheet"
-        href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Caveat:wght@500;600&family=JetBrains+Mono:wght@500;700&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Caveat:wght@500;600&family=JetBrains+Mono:wght@500;700&display=swap"
       />
 
       {songSrc && <audio ref={audioRef} src={songSrc} loop preload="auto" />}
@@ -411,13 +403,30 @@ export default function ShowtimeCountdown({
         <div className="rail left" />
         <div className="rail right" />
         <div className="flicker" ref={flickerRef} />
+        <div className="vignette" />
+        <div className="spotlight" />
+        <div className="grain" />
       </div>
+
+      {showPreviewButton && (
+        <button
+          type="button"
+          className="preview-btn"
+          onClick={triggerUnlock}
+        >
+          Preview
+        </button>
+      )}
 
       <div className="lock">
         <div className="curtain-l" ref={curtainLRef} />
         <div className="curtain-r" ref={curtainRRef} />
 
         <div className="screen">
+          <span className="corner corner-tl" aria-hidden="true">✦</span>
+          <span className="corner corner-tr" aria-hidden="true">✦</span>
+          <span className="corner corner-bl" aria-hidden="true">✦</span>
+          <span className="corner corner-br" aria-hidden="true">✦</span>
           <div className="lock-content" ref={lockContentRef}>
             <div className="bulb-rail top" ref={bulbTopRef} />
             <div className="ticker">
@@ -430,7 +439,11 @@ export default function ShowtimeCountdown({
             </div>
             <div className="bulb-rail bottom" ref={bulbBottomRef} />
 
-            <h1 className="marquee-title">{marqueeTitle}</h1>
+            <h1 className="marquee-title">
+              <span className="marquee-title-star" aria-hidden="true">✦</span>
+              {marqueeTitle}
+              <span className="marquee-title-star" aria-hidden="true">✦</span>
+            </h1>
             <p className="marquee-sub">{marqueeSub}</p>
 
             <div className="hero-days">
@@ -453,10 +466,8 @@ export default function ShowtimeCountdown({
               </div>
             </div>
 
+            <div className="perforation" aria-hidden="true" />
             <p className="lock-foot">{doorsText}</p>
-            {/* <button className="peek" onClick={triggerUnlock}>
-              preview the show →
-            </button> */}
           </div>
         </div>
       </div>
@@ -473,8 +484,10 @@ export default function ShowtimeCountdown({
           --muted: #a8957a;
           --film: #241a10;
           --font-display: 'Bebas Neue', sans-serif;
+          --font-marquee: 'Anton', 'Bebas Neue', sans-serif;
           --font-script: 'Caveat', cursive;
           --font-mono: 'JetBrains Mono', monospace;
+          --gold: #d4af6a;
           --rail: 26px;
 
           position: fixed;
@@ -483,7 +496,7 @@ export default function ShowtimeCountdown({
           height: 100vh;
           height: 100dvh;
           z-index: 999;
-          background: var(--bg);
+          background: radial-gradient(120% 90% at 50% 40%, var(--bg-2) 0%, var(--bg) 70%);
           color: var(--cream);
           font-family: var(--font-mono);
           -webkit-font-smoothing: antialiased;
@@ -522,6 +535,80 @@ export default function ShowtimeCountdown({
           mix-blend-mode: overlay;
         }
 
+        /* Soft dark corners so the frame reads like it's lit by a single
+           projector beam rather than flat-lit edge to edge. */
+        .showtime-root .vignette {
+          position: absolute;
+          inset: 0;
+          z-index: 4;
+          pointer-events: none;
+          background: radial-gradient(120% 85% at 50% 42%, transparent 45%, rgba(0, 0, 0, 0.55) 100%);
+        }
+
+        /* A slow, faint beam sweeping past the title — the one bit of
+           ambient motion that reads as "cinema" rather than "loading". */
+        .showtime-root .spotlight {
+          position: absolute;
+          top: -20%;
+          left: -30%;
+          width: 60%;
+          height: 140%;
+          z-index: 4;
+          pointer-events: none;
+          background: linear-gradient(
+            100deg,
+            transparent 0%,
+            rgba(240, 168, 60, 0.05) 45%,
+            rgba(240, 168, 60, 0.09) 50%,
+            rgba(240, 168, 60, 0.05) 55%,
+            transparent 100%
+          );
+          animation: showtime-sweep 9s ease-in-out infinite;
+          mix-blend-mode: screen;
+        }
+        @keyframes showtime-sweep {
+          0% { transform: translateX(0); }
+          50% { transform: translateX(220%); }
+          100% { transform: translateX(0); }
+        }
+
+        /* Very light grain so the amber/maroon gradients don't band on
+           flat panels. */
+        .showtime-root .grain {
+          position: absolute;
+          inset: 0;
+          z-index: 5;
+          pointer-events: none;
+          opacity: 0.05;
+          mix-blend-mode: overlay;
+          background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+          background-size: 160px 160px;
+        }
+
+        .showtime-root .preview-btn {
+          position: absolute;
+          top: max(14px, env(safe-area-inset-top));
+          right: max(14px, env(safe-area-inset-right));
+          z-index: 1000;
+          font-family: var(--font-display);
+          font-size: 12px;
+          letter-spacing: 0.14em;
+          text-transform: uppercase;
+          color: var(--gold);
+          background: rgba(18, 13, 10, 0.55);
+          border: 1px solid rgba(212, 175, 106, 0.4);
+          border-radius: 999px;
+          padding: 6px 14px;
+          cursor: pointer;
+          backdrop-filter: blur(2px);
+          transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+        }
+        .showtime-root .preview-btn:hover {
+          background: rgba(212, 175, 106, 0.16);
+          border-color: var(--gold);
+          color: var(--cream);
+        }
+
         .showtime-root .lock {
           position: absolute;
           inset: 0;
@@ -536,7 +623,7 @@ export default function ShowtimeCountdown({
            ticker and text are framed instead of stretching across whatever
            width the monitor happens to be. Shrinks by height on short
            screens and by width on narrow ones, whichever runs out first. */
-        
+
       .showtime-root .screen {
   position: relative;
   z-index: 10;
@@ -546,7 +633,22 @@ export default function ShowtimeCountdown({
   align-items: center;
   justify-content: center;
   container-type: size;
+  box-shadow: inset 0 0 0 1px rgba(212, 175, 106, 0.16), inset 0 0 40px rgba(0, 0, 0, 0.4);
 }
+
+        .showtime-root .corner {
+          position: absolute;
+          z-index: 15;
+          font-size: clamp(10px, 1.8cqw, 14px);
+          color: var(--gold);
+          opacity: 0.55;
+          text-shadow: 0 0 6px var(--amber-glow);
+          pointer-events: none;
+        }
+        .showtime-root .corner-tl { top: 10px; left: 12px; }
+        .showtime-root .corner-tr { top: 10px; right: 12px; }
+        .showtime-root .corner-bl { bottom: 10px; left: 12px; }
+        .showtime-root .corner-br { bottom: 10px; right: 12px; }
 
         .showtime-root .curtain-l,
         .showtime-root .curtain-r {
@@ -562,7 +664,10 @@ export default function ShowtimeCountdown({
              tight repeating patterns shimmer/moiré under transform on most
              displays, which is what read as a "glitch" during the curtain
              animation. */
-          background-image: repeating-linear-gradient(
+          background-image:
+            radial-gradient(140% 55% at 50% -8%, rgba(255, 255, 255, 0.1), transparent 60%),
+            linear-gradient(180deg, rgba(0,0,0,0.25) 0%, rgba(0,0,0,0) 12%, rgba(0,0,0,0) 88%, rgba(0,0,0,0.3) 100%),
+            repeating-linear-gradient(
             90deg,
             var(--maroon) 0,
             var(--maroon) 26px,
@@ -622,6 +727,9 @@ export default function ShowtimeCountdown({
           border-top: 1px solid var(--amber-glow);
           border-bottom: 1px solid var(--amber-glow);
           padding: 1.4cqh 0;
+          /* Fade the scrolling text at both edges instead of a hard cut. */
+          -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 8%, #000 92%, transparent 100%);
+          mask-image: linear-gradient(90deg, transparent 0%, #000 8%, #000 92%, transparent 100%);
         }
         .showtime-root .ticker-track {
           display: flex;
@@ -641,23 +749,59 @@ export default function ShowtimeCountdown({
         }
 
         .showtime-root .marquee-title {
-          font-family: var(--font-display);
-          font-size: clamp(2rem, 9cqw, 4.6rem);
-          letter-spacing: 0.03em;
+          font-family: var(--font-marquee);
+          font-weight: 400;
+          font-size: clamp(2.1rem, 9.4cqw, 4.8rem);
+          letter-spacing: 0.01em;
           color: var(--cream);
-          line-height: 0.95;
-          text-shadow: 0 0 26px var(--amber-glow);
+          line-height: 0.9;
+          text-shadow:
+            0 1px 0 rgba(0, 0, 0, 0.5),
+            0 2px 0 rgba(0, 0, 0, 0.35),
+            0 0 22px var(--amber-glow),
+            0 0 60px rgba(240, 168, 60, 0.22);
           margin-top: 2.6cqh;
+          display: inline-flex;
+          align-items: center;
+          gap: 0.4em;
+          animation: showtime-title-in 1.1s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+        .showtime-root .marquee-title-star {
+          font-size: 0.32em;
+          color: var(--amber);
+          opacity: 0.8;
+          animation: showtime-twinkle 2.4s ease-in-out infinite;
+        }
+        .showtime-root .marquee-title-star:last-child {
+          animation-delay: 1.1s;
+        }
+        @keyframes showtime-title-in {
+          from { opacity: 0; transform: translateY(10px) scale(0.97); letter-spacing: 0.16em; }
+          to { opacity: 1; transform: translateY(0) scale(1); letter-spacing: 0.03em; }
+        }
+        @keyframes showtime-twinkle {
+          0%, 100% { opacity: 0.35; transform: scale(0.85); }
+          50% { opacity: 1; transform: scale(1.1); }
         }
         .showtime-root .marquee-sub {
           font-family: var(--font-script);
           font-size: clamp(1rem, 3cqw, 1.4rem);
-          color: var(--amber);
+          color: var(--gold);
           margin: 1cqh 0 0;
+          text-shadow: 0 0 14px rgba(212, 175, 106, 0.3);
         }
 
         .showtime-root .hero-days {
+          position: relative;
           margin: 3cqh 0 0.6cqh;
+        }
+        .showtime-root .hero-days::before {
+          content: '';
+          position: absolute;
+          inset: -14% -10%;
+          z-index: -1;
+          background: radial-gradient(50% 60% at 50% 45%, rgba(240, 168, 60, 0.16) 0%, transparent 75%);
+          filter: blur(2px);
         }
         .showtime-root .hero-days .od-col {
           width: clamp(34px, 9cqw, 64px);
@@ -687,7 +831,7 @@ export default function ShowtimeCountdown({
         }
         .showtime-root .bulb-tile {
           position: relative;
-          background: var(--bg-2);
+          background: linear-gradient(180deg, var(--bg-2) 0%, rgba(18, 13, 10, 0.9) 100%);
           border: 1px solid rgba(243, 230, 207, 0.14);
           border-radius: 8px;
           padding: 1.4cqh 1.4cqw 1cqh;
@@ -695,7 +839,18 @@ export default function ShowtimeCountdown({
           flex-direction: column;
           align-items: center;
           gap: 0.6cqh;
-          box-shadow: 0 14px 30px -14px rgba(0, 0, 0, 0.7);
+          box-shadow: 0 14px 30px -14px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(243, 230, 207, 0.06);
+          overflow: hidden;
+        }
+        .showtime-root .bulb-tile::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          height: 2px;
+          background: linear-gradient(90deg, transparent, var(--amber), transparent);
+          opacity: 0.65;
         }
         .showtime-root .bulb-tile .od-number {
           display: flex;
@@ -714,6 +869,21 @@ export default function ShowtimeCountdown({
           height: clamp(28px, 7cqw, 40px);
           overflow: hidden;
           display: inline-block;
+          border-radius: 3px;
+          background: linear-gradient(180deg, #1a130d 0%, #0d0906 100%);
+          box-shadow: inset 0 0 0 1px rgba(212, 175, 106, 0.18), inset 0 2px 4px rgba(0, 0, 0, 0.6);
+        }
+        .showtime-root .od-col::after {
+          content: '';
+          position: absolute;
+          top: 50%;
+          left: 0;
+          right: 0;
+          height: 1px;
+          background: rgba(0, 0, 0, 0.55);
+          box-shadow: 0 1px 0 rgba(255, 255, 255, 0.03);
+          z-index: 1;
+          pointer-events: none;
         }
         .showtime-root .od-strip {
           display: flex;
@@ -732,29 +902,21 @@ export default function ShowtimeCountdown({
           text-shadow: 0 0 10px var(--amber-glow);
         }
 
+        .showtime-root .perforation {
+          width: min(220px, 60%);
+          height: 1px;
+          margin-top: 2.4cqh;
+          background-image: radial-gradient(circle, rgba(212, 175, 106, 0.5) 1.1px, transparent 1.2px);
+          background-size: 9px 1px;
+          background-repeat: repeat-x;
+          opacity: 0.7;
+        }
         .showtime-root .lock-foot {
-          margin-top: 2.6cqh;
+          margin-top: 1.1cqh;
           font-size: clamp(9px, 1.6cqw, 10.5px);
           letter-spacing: 0.16em;
-          color: var(--muted);
+          color: var(--gold);
           text-transform: uppercase;
-        }
-        .showtime-root .peek {
-          background: none;
-          border: 1px solid var(--amber-glow);
-          color: var(--amber);
-          cursor: pointer;
-          font-family: var(--font-display);
-          font-size: clamp(10px, 1.8cqw, 12px);
-          letter-spacing: 0.16em;
-          padding: 1.2cqh 3cqw;
-          border-radius: 99px;
-          margin-top: 1.6cqh;
-          transition: background 0.2s ease, color 0.2s ease;
-        }
-        .showtime-root .peek:hover {
-          background: var(--amber);
-          color: var(--bg);
         }
 
         @media (max-width: 560px) {
@@ -763,16 +925,22 @@ export default function ShowtimeCountdown({
           }
         }
 
-        
+
         @media (max-height: 480px), (max-width: 380px) {
           .showtime-root .bulb-rail.top,
-          .showtime-root .ticker {
+          .showtime-root .ticker,
+          .showtime-root .corner {
             display: none;
           }
         }
 
         @media (prefers-reduced-motion: reduce) {
           .showtime-root .ticker-track {
+            animation: none !important;
+          }
+          .showtime-root .spotlight,
+          .showtime-root .marquee-title,
+          .showtime-root .marquee-title-star {
             animation: none !important;
           }
         }
@@ -782,9 +950,10 @@ export default function ShowtimeCountdown({
 
   return (
     <>
-      {/* mounted flips true in the same tick as revealed — only after the
-          curtain has fully finished opening. Nothing of yours mounts, and
-          no autoplay of yours can fire, a moment before that. */}
+      {/* mounted flips true right as the lock screen starts to fade — your
+          content paints hidden behind it, then the fade reveals an
+          already-painted page. No autoplay of yours can fire, or overlap
+          the lock-screen song, a moment before that. */}
       {mounted && !redirectTo && children}
       {!revealed && isClient && createPortal(overlay, document.body)}
     </>

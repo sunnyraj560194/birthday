@@ -11,16 +11,29 @@ const handwriting = Caveat({
   weight: ["400", "500", "600", "700"],
 });
 
+// const images = [
+//   "/pipis/pipi3.jpg",
+//   "/pipis/pipi4.jpg",
+//   "/pipis/pipi5.jpg",
+//   "/pipis/pipi6.jpg",
+//   "/pipis/pipi7.jpg",
+//   // "/pipis/pipi8.jpg",
+//   "/pipis/pipi9.jpg",
+//   "/pipis/pipi10.jpg",
+//   "/pipis/pipi11.jpg",
+// ];
+
 const images = [
-  "/pipis/pipi3.jpg",
-  "/pipis/pipi4.jpg",
-  "/pipis/pipi5.jpg",
-  "/pipis/pipi6.jpg",
-  "/pipis/pipi7.jpg",
-  // "/pipis/pipi8.jpg",
-  "/pipis/pipi9.jpg",
-  "/pipis/pipi10.jpg",
-  "/pipis/pipi11.jpg",
+  "/ref/girl2.jpg",
+  "/ref/girl3.jpg",
+  "/ref/girl4.jpg",
+  "/ref/girl5.jpg",
+  "/ref/girl6.jpg",
+  "/ref/girl7.jpg",
+  "/ref/girl8.jpg",
+  "/ref/girl9.jpg",
+  "/ref/girl10.jpg",
+  "/ref/girl11.jpg",
 ];
 
 const captions = [
