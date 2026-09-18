@@ -63,7 +63,6 @@ All images are stored inside the `/public/ref/` folder.
      * **Hero Page Scrolling Image Stream**: Update the `imgs` array in [HeroSection.tsx](file:///c:/react-node%20projects/pipi-birthday/birthday-wish/components/sections/HeroSection.tsx#L10).
      * **Polaroid Draggable Cards Captions & Images**: Update the `images` and `captions` arrays in [LoveGallery.tsx](file:///c:/react-node%20projects/pipi-birthday/birthday-wish/components/LoveGallery.tsx#L26).
      * **3D Stellar Starfield Cards**: Update the `cards` array in [NewWorld.tsx](file:///c:/react-node%20projects/pipi-birthday/birthday-wish/components/NewWorld.tsx#L81).
-
 ### 4. 🎵 Change the Background Music
 * **File to replace**: `public/sounds/pipi-song.mp3` inside [sounds directory](file:///c:/react-node%20projects/pipi-birthday/birthday-wish/public/sounds/)
 * **What to do**:

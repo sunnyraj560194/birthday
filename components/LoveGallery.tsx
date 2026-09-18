@@ -24,28 +24,28 @@ const handwriting = Caveat({
 // ];
 
 const images = [
-  "/ref/girl2.jpg",
-  "/ref/girl3.jpg",
-  "/ref/girl4.jpg",
-  "/ref/girl5.jpg",
-  "/ref/girl6.jpg",
-  "/ref/girl7.jpg",
-  "/ref/girl8.jpg",
-  "/ref/girl9.jpg",
-  "/ref/girl10.jpg",
-  "/ref/girl11.jpg",
+  "/ref/2.jpg",
+  "/ref/13.jpg",
+  "/ref/14.jpg",
+  "/ref/18.jpg",
+  "/ref/17.jpg",
+  "/ref/15.jpg",
+  "/ref/5.jpg",
+  "/ref/9.jpg",
+  "/ref/16.jpg",
+  "/ref/1.jpg",
 ];
 
 const captions = [
   "Cutie 🥹",
-  "Baddie 😎",
+  "Pyariii 😎",
   "Pretty ✨",
-  "My Love 🤍",
+  "11:11 🤍",
   "Sunshine ☀️",
   // "Angel 🪽",
   "Beautiful 🌸",
-  "Dream Girl 💫",
-  "Queen 👑",
+  "Cutiee Piee 💫",
+  "Twinkiee 👑",
 ];
 
 const positions = [

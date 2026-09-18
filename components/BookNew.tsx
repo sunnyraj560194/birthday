@@ -251,7 +251,7 @@ export default function Book() {
         {/* frame10: scale-65 (0.65) -> photoWidth/Height compensated: 132 / 0.65 ≈ 203 */}
         <PhotoInFrame
           frameSrc="/elements/frame10.png"
-          photoSrc="/ref/girl2.jpg"
+          photoSrc="/ref/2.jpg"
           frameClassName="scale-65 rotate-10 translate-x-14 -translate-y-20"
           photoOffsetX={0}
           photoOffsetY={0}
@@ -304,14 +304,14 @@ export default function Book() {
         {/* These 3 photos don't share frame9's transform in the original — independent
             decorative photos, not individually boxed by frame9. Kept as SimplePhoto. */}
         <SimplePhoto
-          src="/ref/girl.jpg"
+          src="/ref/8.jpg"
           width={88}
           height={88}
           wrapperClassName="rotate-20 translate-x-19 -translate-y-22"
         />
 
         <SimplePhoto
-          src="/ref/girl3.jpg"
+          src="/ref/4.jpg"
           width={76}
           height={76}
           wrapperClassName="rotate-20 translate-x-26 -translate-y-43"

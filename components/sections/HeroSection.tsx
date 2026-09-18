@@ -8,18 +8,18 @@ const path =
 
 // Local photos from /public/ref — resolve to /ref/*.jpg at runtime.
 const imgs = [
-  { src: "/ref/heart.jpg" },
-  { src: "/ref/girl.jpg" },
-  { src: "/ref/girl2.jpg" },
-  { src: "/ref/girl3.jpg" },
-  { src: "/ref/girl4.jpg" },
-  { src: "/ref/girl5.jpg" },
-  { src: "/ref/girl6.jpg" },
-  { src: "/ref/girl7.jpg" },
-  { src: "/ref/girl8.jpg" },
-  { src: "/ref/girl9.jpg" },
-  { src: "/ref/girl10.jpg" },
-  { src: "/ref/girl11.jpg" },
+  { src: "/ref/1.jpg" },
+  { src: "/ref/2.jpg" },
+  { src: "/ref/3.jpg" },
+  { src: "/ref/4.jpg" },
+  { src: "/ref/5.jpg" },
+  { src: "/ref/6.jpg" },
+  { src: "/ref/7.jpg" },
+  { src: "/ref/8.jpg" },
+  { src: "/ref/11.jpg" },
+  { src: "/ref/9.jpg" },
+  { src: "/ref/10.jpg" },
+  { src: "/ref/14.jpg" },
 ];
 
 // const imgs = [
@@ -60,7 +60,7 @@ export const HeroSection = () => {
 
       {/* Top row: quiet date stamp, nothing else competing for attention */}
       <div className="hero-mono flex items-center justify-between px-8 pt-8 text-[11px] uppercase tracking-[0.25em] text-[#8A8A80] sm:px-14">
-        <span>Aug 5</span>
+        <span>Sept. 19</span>
         {/* <span>One more lap</span> */}
       </div>
 
@@ -71,7 +71,7 @@ export const HeroSection = () => {
           <br />
           <span className="font-bold">Birthday</span>
           <br/>
-          <span className="font-bold mt-1 text-amber-500">Sweety</span>
+          <span className="font-bold mt-1 text-amber-500">Twinkieee :)</span>
         </h1>
         <div className="mt-6 h-px w-16 bg-[#9C7A3F]" />
         <p className="hero-body mt-6 max-w-sm text-base leading-relaxed text-[#4A4A42]">

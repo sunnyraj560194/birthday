@@ -115,7 +115,7 @@ export default function Book() {
         ></Image>
 
         <Image
-          src="/ref/girl.jpg"
+          src="/ref/9.jpg"
           alt="Front Cover"
           fill
           priority
@@ -178,7 +178,7 @@ export default function Book() {
         ></Image>
 
         <Image
-          src="/ref/girl.jpg"
+          src="/ref/11.jpg"
           alt="Front Cover"
           fill
           priority
@@ -187,7 +187,7 @@ export default function Book() {
         ></Image>
 
         <Image
-          src="/ref/girl2.jpg"
+          src="/ref/17.jpg"
           alt="Front Cover"
           fill
           priority
@@ -196,7 +196,7 @@ export default function Book() {
         ></Image>
 
         <Image
-          src="/ref/girl3.jpg"
+          src="/ref/13.jpg"
           alt="Front Cover"
           fill
           priority
@@ -281,7 +281,7 @@ export default function Book() {
         />
 
         <Image
-          src="/ref/girl4.jpg"
+          src="/ref/15.jpg"
           alt="Frame"
           fill
           priority
@@ -381,7 +381,7 @@ export default function Book() {
         />
 
         <Image
-          src="/ref/girl5.jpg"
+          src="/ref/5.jpg"
           alt="Disk"
           fill
           priority
@@ -408,7 +408,7 @@ export default function Book() {
         />
 
         <Image
-          src="/elements/miss.png"
+          src="/elements/rosel.png"
           alt="Disk"
           fill
           priority
@@ -468,7 +468,7 @@ export default function Book() {
         />
 
         <Image
-          src="/ref/girl4.jpg"
+          src="/ref/16.jpg"
           alt="Disk"
           fill
           priority
@@ -477,7 +477,7 @@ export default function Book() {
         />
 
         <Image
-          src="/ref/girl10.jpg"
+          src="/ref/10.jpg"
           alt="Disk"
           fill
           priority
@@ -547,7 +547,7 @@ export default function Book() {
 
 
           <Image
-          src="/ref/girl9.jpg"
+          src="/ref/9.jpg"
           alt="Disk"
           fill
           priority
@@ -556,7 +556,7 @@ export default function Book() {
         />
         
           <Image
-          src="/ref/girl8.jpg"
+          src="/ref/8.jpg"
           alt="Disk"
           fill
           priority
