@@ -194,8 +194,8 @@ export default function ShowtimeCountdown({
         el.appendChild(dot);
       }
     };
-    build(bulbTopRef.current, 22);
-    build(bulbBottomRef.current, 22);
+    build(bulbTopRef.current, 19);
+    build(bulbBottomRef.current, 19);
   }, [revealed, isClient]);
 
   /* ---------- ambient motion: bulb pulse + projector flicker (only while locked) ---------- */
